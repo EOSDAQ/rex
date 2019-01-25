@@ -78,7 +78,22 @@ const transact = async (actions) => {
 		rexBalance = rex.balance;
 	}
 	document.getElementById('rex_balance').innerText = `Rex balance: ${rexBalance}`;
-	return;
+	
+
+	document.getElementById('buyrex')
+		.addEventListener('mousedown', async () => {
+			const { value } = document.getElementById('buyrex_input');
+
+			await transact([{
+				account: 'eosio',
+				name: 'buyrex',
+				authorization,
+				data: {
+					from: accountName,
+					amount: `${parseFloat(value).toFixed(4)} EOS`
+				}
+			}])
+		})
 
 	// const account = await rpc.get_account(accountName);
 	// const { voter_info } = account;
@@ -92,23 +107,23 @@ const transact = async (actions) => {
 	// 		amount: '0.1000 EOS'
 	// 	}
 	// }])
-	if (!is_proxy || producers.length === 0) {
-		const answer = confirm('you must vote to buy REX. Do you want to use eosdaq proxy to delegate your votes');
+	// if (!is_proxy || producers.length === 0) {
+	// 	const answer = confirm('you must vote to buy REX. Do you want to use eosdaq proxy to delegate your votes');
 		
-		if (answer) {
-			// const contract = await api.getContract('eosio');
-			// console.log(contract);
-			// await transact([{
-			// 	account: 'eosio',
-			// 	name: 'updaterex',
-			// 	authorization,
-			// 	data: {
-			// 		owner: accountName,
-			// 	}
-			// }])
-		}
-		return;
-	}
+	// 	if (answer) {
+	// 		// const contract = await api.getContract('eosio');
+	// 		// console.log(contract);
+	// 		// await transact([{
+	// 		// 	account: 'eosio',
+	// 		// 	name: 'updaterex',
+	// 		// 	authorization,
+	// 		// 	data: {
+	// 		// 		owner: accountName,
+	// 		// 	}
+	// 		// }])
+	// 	}
+	// 	return;
+	// }
 
 })();
 
