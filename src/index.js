@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import { Api, JsonRpc, RpcError } from 'eosjs';
 import JsSignatureProvider from 'eosjs/dist/eosjs-jssig';
 

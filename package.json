@@ -7,12 +7,11 @@
     "eosjs": "^20.0.0-beta3"
   },
   "devDependencies": {
-    "budo": "^11.6.0",
-    "typescript": "^3.2.4"
+    "babel-polyfill": "^6.26.0",
+    "parcel-bundler": "^1.11.0"
   },
   "scripts": {
-    "start": "budo dist/index.js --live",
-    "build": "tsc --p . --w"
+    "start": "parcel src/index.html"
   },
   "repository": {
     "type": "git",
