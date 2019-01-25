@@ -41,34 +41,71 @@ const transact = async (actions) => {
  * 1. buy
  */
 (async () => {
-	const account = await rpc.get_account(accountName);
-	const { voter_info } = account;
-	const { is_proxy, producers, proxy } = voter_info;
-	const result = await transact([{
-		name: 'deposit',
-		account: 'eosio',
-		authorization,
-		data: {
-			owner: accountName,
-			amount: '0.1000 EOS'
-		}
-	}])
+	const balance = await rpc.get_currency_balance('eosio.token', accountName);
+	const eosBalance = balance[0];
+	document.getElementById('eos_balance').innerText = `Eos balance: ${eosBalance}`;
+	
+	const rexfund = await rpc.get_table_rows({
+		code: 'eosio',
+		scope: 'eosio',
+		table: 'rexfund', // rexbal 
+		upper_bound: accountName,
+		lower_bound: accountName,
+	})
+	
+	const { rows: [fund] } = rexfund;
+	let fundBalance;
+	if (!fund) {
+		fundBalance = '0.0000 EOS';
+	} else {
+		fundBalance = fund.balance;
+	}
+	document.getElementById('fund_balance').innerText = `Fund balance: ${fundBalance}`;
+
+	const rexbal = await rpc.get_table_rows({
+		code: 'eosio',
+		scope: 'eosio',
+		table: 'rexbal', // rexbal 
+		upper_bound: accountName,
+		lower_bound: accountName,
+	});
+	
+	const { rows: [rex] } = rexbal;
+	let rexBalance;
+	if (!rex) {
+		rexBalance = '0.0000 EOS';
+	} else {
+		rexBalance = rex.balance;
+	}
+	document.getElementById('rex_balance').innerText = `Rex balance: ${rexBalance}`;
+	return;
+
+	// const account = await rpc.get_account(accountName);
+	// const { voter_info } = account;
+	// const { is_proxy, producers, proxy } = voter_info;
+	// const result = await transact([{
+	// 	name: 'deposit',
+	// 	account: 'eosio',
+	// 	authorization,
+	// 	data: {
+	// 		owner: accountName,
+	// 		amount: '0.1000 EOS'
+	// 	}
+	// }])
 	if (!is_proxy || producers.length === 0) {
 		const answer = confirm('you must vote to buy REX. Do you want to use eosdaq proxy to delegate your votes');
 		
 		if (answer) {
-			// const balance = await rpc.get_currency_balance('rex_fund', accountName);
-			// console.log(balance);
-			const contract = await api.getContract('eosio');
-			console.log(contract);
-			await transact([{
-				account: 'eosio',
-				name: 'updaterex',
-				authorization,
-				data: {
-					owner: accountName,
-				}
-			}])
+			// const contract = await api.getContract('eosio');
+			// console.log(contract);
+			// await transact([{
+			// 	account: 'eosio',
+			// 	name: 'updaterex',
+			// 	authorization,
+			// 	data: {
+			// 		owner: accountName,
+			// 	}
+			// }])
 		}
 		return;
 	}
