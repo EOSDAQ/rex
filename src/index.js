@@ -41,15 +41,38 @@ const transact = async (actions) => {
  * 1. buy
  */
 (async () => {
+	const account = await rpc.get_account(accountName);
+	const { voter_info } = account;
+	const { is_proxy, producers, proxy } = voter_info;
 	const result = await transact([{
 		name: 'deposit',
 		account: 'eosio',
 		authorization,
 		data: {
 			owner: accountName,
-			amount: '5.0000 EOS'
+			amount: '0.1000 EOS'
 		}
 	}])
+	if (!is_proxy || producers.length === 0) {
+		const answer = confirm('you must vote to buy REX. Do you want to use eosdaq proxy to delegate your votes');
+		
+		if (answer) {
+			// const balance = await rpc.get_currency_balance('rex_fund', accountName);
+			// console.log(balance);
+			const contract = await api.getContract('eosio');
+			console.log(contract);
+			await transact([{
+				account: 'eosio',
+				name: 'updaterex',
+				authorization,
+				data: {
+					owner: accountName,
+				}
+			}])
+		}
+		return;
+	}
+
 })();
 
 
