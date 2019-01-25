@@ -75,18 +75,33 @@ const transact = async (actions) => {
 	if (!rex) {
 		rexBalance = '0.0000 EOS';
 	} else {
-		rexBalance = rex.balance;
+		rexBalance = rex.rex_balance;
 	}
 	document.getElementById('rex_balance').innerText = `Rex balance: ${rexBalance}`;
-	
-	const contract = await api.getContract('eosio');
-	console.log(contract);
+	const { rows: producers } = await rpc.get_table_rows({
+		scope: 'eosio',
+		code: 'eosio',
+		table: 'producers',
+		limit: 21,
+	});
+
+	// const contract = await api.getContract('eosio');
+	// await transact([{
+	// 	name: 'voteproducer',
+	// 	account: 'eosio',
+	// 	authorization,
+	// 	data: {
+	// 		voter: accountName,
+	// 		proxy: '',
+	// 		producers: producers.map(p => p.owner),
+	// 	},
+	// }])
 
 	document.getElementById('buyrex')
 		.addEventListener('mousedown', async () => {
 			const { value } = document.getElementById('buyrex_input');
-
-			await transact([{
+			
+			const actions = [{
 				account: 'eosio',
 				name: 'buyrex',
 				authorization,
@@ -94,7 +109,22 @@ const transact = async (actions) => {
 					from: accountName,
 					amount: `${parseFloat(value).toFixed(4)} EOS`
 				}
-			}])
+			}]
+			
+			const needed = value - parseFloat(fundBalance);
+			if (needed > 0) {
+				console.log('will auto-deposit fund');
+				actions.unshift({
+					account: 'eosio',
+					name: 'deposit',
+					authorization,
+					data: {
+						owner: accountName,
+						amount: `${needed.toFixed(4)} EOS`
+					}
+				})
+			}
+			await transact(actions);
 		})
 
 	// const account = await rpc.get_account(accountName);
