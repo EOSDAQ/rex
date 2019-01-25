@@ -1,0 +1,27 @@
+{
+  "name": "rex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "eosjs": "^20.0.0-beta3"
+  },
+  "devDependencies": {
+    "budo": "^11.6.0",
+    "typescript": "^3.2.4"
+  },
+  "scripts": {
+    "start": "budo dist/index.js --live",
+    "build": "tsc --p . --w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EOSDAQ/rex.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EOSDAQ/rex/issues"
+  },
+  "homepage": "https://github.com/EOSDAQ/rex#readme"
+}
