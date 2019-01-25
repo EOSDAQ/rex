@@ -79,6 +79,8 @@ const transact = async (actions) => {
 	}
 	document.getElementById('rex_balance').innerText = `Rex balance: ${rexBalance}`;
 	
+	const contract = await api.getContract('eosio');
+	console.log(contract);
 
 	document.getElementById('buyrex')
 		.addEventListener('mousedown', async () => {
