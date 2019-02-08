@@ -1,10 +1,11 @@
 import 'babel-polyfill';
 import { Api, JsonRpc, RpcError } from 'eosjs';
 import JsSignatureProvider from 'eosjs/dist/eosjs-jssig';
+import { SerialBuffer } from 'eosjs/dist/eosjs-serialize';
 
-const endpoint = 'http://145.239.133.201:8888';
-const accountName = 'indegsereos1';
-const pk = '5J5XdWGX5zLzXkbs8NpjwaWakFvgfwQbDgZT3kJxWiTW18TqSAF';
+const endpoint = 'http://nodeos.eosdaq.test:18888';
+const accountName = 'user.eos';
+const pk = '5JY8sxGoB1rGgMKcwgZv1QQpa5Xxdg5oQ2UfA8aBB8Pdsmg14yg';
 const authorization = [{
 	actor: accountName,
 	permission: 'active',
@@ -164,13 +165,43 @@ const transact = async (actions) => {
  * 2. sell
  */
 (async () => {
-	// const result = await transact([{
-	// 	name: 'deposit',
-	// 	account: 'eosio',
-	// 	authorization,
-	// 	data: {
-	// 		owner: accountName,
-	// 		amount: '5.0000 EOS'
-	// 	}
-	// }])
+	document.getElementById('sellrex')
+		.addEventListener('mousedown', async () => {
+			const { value } = document.getElementById('sellrex_input');
+			
+			const actions = [{
+				account: 'eosio',
+				name: 'sellrex',
+				authorization,
+				data: {
+					from: accountName,
+					rex: `${parseFloat(value).toFixed(4)} REX`
+				}
+			}]
+			
+			// const needed = value - parseFloat(fundBalance);
+			// if (needed > 0) {
+			// 	console.log('will auto-deposit fund');
+			// 	actions.unshift({
+			// 		account: 'eosio',
+			// 		name: 'deposit',
+			// 		authorization,
+			// 		data: {
+			// 			owner: accountName,
+			// 			amount: `${needed.toFixed(4)} EOS`
+			// 		}
+			// 	})
+			// }
+			const result = await transact(actions);
+			const { processed: { action_traces: [{ inline_traces }] } } = result;
+			const [{ act: { data }}] = inline_traces;
+
+			const res = data.slice(0, 8)
+				.match(/.{1,2}/g)
+				.reverse()
+				.join('');
+
+			const eos = parseInt('0x' + res, 16);
+			console.log(eos);
+		});
 })();
