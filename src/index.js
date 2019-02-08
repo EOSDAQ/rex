@@ -70,7 +70,7 @@ const transact = async (actions) => {
 		upper_bound: accountName,
 		lower_bound: accountName,
 	});
-	
+
 	const { rows: [rex] } = rexbal;
 	let rexBalance;
 	if (!rex) {
@@ -86,6 +86,30 @@ const transact = async (actions) => {
 		limit: 21,
 	});
 
+	const parentNode = document.getElementById('rex_maturities');
+	if (rex.rex_maturities) {
+		for (const m of rex.rex_maturities) {
+			const { first, second } = m;
+			const now = new Date();
+			const mDate = new Date(first);
+			const mTime = new Date(+mDate - now.getTimezoneOffset() * 6e4).getTime();
+			if (mTime < now) {
+				continue;
+			}
+
+			const matureNode = document.createElement('li');
+			const value = (second / Math.pow(10, 4)).toFixed(4);
+			const fourDays = 4 * 24 * 1000 * 60 * 60;
+			if (mTime > (now.getTime() + fourDays)) {
+				matureNode.textContent = `Savings: ${value} REX`;
+			} else {
+				const d = new Date(mTime).toLocaleString();
+				matureNode.textContent = `${d}: ${value} REX`;
+			}
+			parentNode.appendChild(matureNode);
+		}
+
+	}
 	// const contract = await api.getContract('eosio');
 	// await transact([{
 	// 	name: 'voteproducer',
@@ -168,7 +192,6 @@ const transact = async (actions) => {
 	document.getElementById('sellrex')
 		.addEventListener('mousedown', async () => {
 			const { value } = document.getElementById('sellrex_input');
-			
 			const actions = [{
 				account: 'eosio',
 				name: 'sellrex',
@@ -193,15 +216,37 @@ const transact = async (actions) => {
 			// 	})
 			// }
 			const result = await transact(actions);
-			const { processed: { action_traces: [{ inline_traces }] } } = result;
-			const [{ act: { data }}] = inline_traces;
+			// const { processed: { action_traces: [{ inline_traces }] } } = result;
+			// const [{ act: { data }}] = inline_traces;
 
-			const res = data.slice(0, 8)
-				.match(/.{1,2}/g)
-				.reverse()
-				.join('');
+			// const res = data.slice(0, 8)
+			// 	.match(/.{1,2}/g)
+			// 	.reverse()
+			// 	.join('');
 
-			const eos = parseInt('0x' + res, 16);
-			console.log(eos);
+			// const eos = parseInt(res, 16);
+			// alert(`will receive ${eos / 10000} EOS`);
+		});
+})();
+
+/**
+ * 2. savings.
+ */
+(async () => {
+	document.getElementById('saverex')
+		.addEventListener('mousedown', async () => {
+			const { value } = document.getElementById('saverex_input');
+			
+			const actions = [{
+				account: 'eosio',
+				name: 'mvtosavings',
+				authorization,
+				data: {
+					owner: accountName,
+					rex: `${parseFloat(value).toFixed(4)} REX`
+				}
+			}]
+			
+			const result = await transact(actions);
 		});
 })();
