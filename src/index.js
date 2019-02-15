@@ -41,6 +41,17 @@ const transact = async (actions) => {
 /**
  * 1. buy
  */
+
+const renderBandwidths = ({ rows }) => {
+	const container = document.getElementById('delband');
+	for (const row of rows) {
+		const { cpu_weight, from, to, net_weight } = row;
+		const node = document.createElement('div');
+		node.textContent = `from: ${from}, to: ${to}, cpu: ${cpu_weight}, net: ${net_weight}`;
+		container.appendChild(node);
+	}
+}
+
 (async () => {
 	const balance = await rpc.get_currency_balance('eosio.token', accountName);
 	const eosBalance = balance[0];
@@ -71,6 +82,16 @@ const transact = async (actions) => {
 		lower_bound: accountName,
 	});
 
+	const delband = await rpc.get_table_rows({
+		code: 'eosio',
+		scope: accountName,
+		table: 'delband', // rexbal 
+		// upper_bound: accountName,
+		// lower_bound: accountName,
+	});
+
+	renderBandwidths(delband);
+
 	const { rows: [rex] } = rexbal;
 	let rexBalance;
 	if (!rex) {
@@ -93,7 +114,7 @@ const transact = async (actions) => {
 			const now = new Date();
 			const mDate = new Date(first);
 			const mTime = new Date(+mDate - now.getTimezoneOffset() * 6e4).getTime();
-			if (mTime < now) {
+			if (mTime < now.getTime()) {
 				continue;
 			}
 
