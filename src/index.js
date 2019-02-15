@@ -271,3 +271,31 @@ const renderBandwidths = ({ rows }) => {
 			const result = await transact(actions);
 		});
 })();
+
+// 3. unstaketorex.
+(async () => {
+	document.getElementById('unstaketorex')
+		.addEventListener('mousedown', async () => {
+			const { value: from_cpu = 0 } = document.getElementById('from_cpu');
+			const { value: from_net = 0 } = document.getElementById('from_net');
+			const toEOS = (value) => {
+				return parseFloat(value).toFixed(4) + ' EOS';
+			}
+
+			const actions = [{
+				account: 'eosio',
+				name: 'unstaketorex',
+				authorization,
+				data: {
+					owner: accountName,
+					receiver: accountName,
+					from_net: toEOS(from_net),
+					from_cpu: toEOS(from_cpu),
+				}
+			}]
+
+			console.log(actions);
+
+			const result = await transact(actions);
+		})
+})();
